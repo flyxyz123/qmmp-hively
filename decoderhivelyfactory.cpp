@@ -2,7 +2,7 @@
 #include "decoder_hively.h"
 #include "decoderhivelyfactory.h"
 
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 bool DecoderHivelyFactory::canDecode(QIODevice *) const
 {
