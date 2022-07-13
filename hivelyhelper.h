@@ -1,6 +1,6 @@
-/* =================================================
+/***************************************************************************
  * This file is part of the TTK qmmp plugin project
- * Copyright (C) 2015 - 2021 Greedysky Studio
+ * Copyright (C) 2015 - 2022 Greedysky Studio
 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 
  * You should have received a copy of the GNU General Public License along
  * with this program; If not, see <http://www.gnu.org/licenses/>.
- ================================================= */
+ ***************************************************************************/
 
 #ifndef HIVELYHELPER_H
 #define HIVELYHELPER_H
@@ -22,11 +22,9 @@
 #include <QMap>
 #include <QFile>
 #include <qmmp/qmmp.h>
-
-typedef struct {
-    struct hvl_tune *input;
-    int bitrate;
-} decode_info;
+extern "C" {
+#include <libhively/hvl_replay.h>
+}
 
 /*!
  * @author Greedysky <greedysky@163.com>
@@ -38,23 +36,30 @@ public:
     ~HivelyHelper();
 
     void deinit();
-
     bool initialize();
-    qint64 totalTime() const;
-    void seek(qint64 time);
 
-    int bitrate() const;
-    int sampleRate() const;
-    int channels() const;
-    int bitsPerSample() const;
+    inline void seek(qint64 time) { hvl_Seek(m_input, time); }
+    inline qint64 totalTime() const { return hvl_GetPlayTime(m_input); }
+
+    inline int bitrate() const { return 8; }
+    inline int sampleRate() const { return 44100; }
+    inline int channels() const { return 2; }
+    inline int depth() const { return 16; }
 
     qint64 read(unsigned char *data, qint64 maxSize);
-    const QMap<Qmmp::MetaData, QString> &readMetaData() const;
+
+    inline QString title() const { return m_input->ht_Name; }
+    inline int subSongCount() const { return m_input->ht_SubsongNr; }
+    inline int instrumentCount() const { return m_input->ht_InstrumentNr; }
+
+    QString format() const;
+    QString subSongs() const;
+    QString instruments() const;
 
 private:
     QString m_path;
-    decode_info *m_info = nullptr;
-    QMap<Qmmp::MetaData, QString> m_metaData;
+    bool m_ahxHeader = true;
+    struct hvl_tune *m_input = nullptr;
 
 };
 

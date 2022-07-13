@@ -16,28 +16,30 @@
  * with this program; If not, see <http://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef DECODERHIVELYFACTORY_H
-#define DECODERHIVELYFACTORY_H
+#ifndef HIVELYMETADATAMODEL_H
+#define HIVELYMETADATAMODEL_H
 
-#include <qmmp/decoderfactory.h>
+#include <qmmp/metadatamodel.h>
+
+class HivelyHelper;
 
 /*!
  * @author Greedysky <greedysky@163.com>
  */
-class DecoderHivelyFactory : public QObject, DecoderFactory
+class HivelyMetaDataModel : public MetaDataModel
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qmmp.qmmp.DecoderFactoryInterface.1.0")
-    Q_INTERFACES(DecoderFactory)
+    Q_DECLARE_TR_FUNCTIONS(HivelyMetaDataModel)
 public:
-    virtual bool canDecode(QIODevice *input) const override final;
-    virtual DecoderProperties properties() const override final;
-    virtual Decoder *create(const QString &path, QIODevice *input) override final;
-    virtual QList<TrackInfo*> createPlayList(const QString &path, TrackInfo::Parts parts, QStringList *ignoredPaths) override final;
-    virtual MetaDataModel* createMetaDataModel(const QString &path, bool readOnly) override final;
-    virtual void showSettings(QWidget *parent) override final;
-    virtual void showAbout(QWidget *parent) override final;
-    virtual QString translation() const override final;
+    explicit HivelyMetaDataModel(const QString &path);
+
+    virtual QList<MetaDataItem> extraProperties() const override final;
+    virtual QList<MetaDataItem> descriptions() const override final;
+
+private:
+    void fillProperties(HivelyHelper *helper);
+
+    QList<MetaDataItem> m_ep;
+    QList<MetaDataItem> m_desc;
 
 };
 
